@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "paletteVersion": "1.0.0",
+  "colorSpace": "CIELAB-D65-2deg",
+  "source": "Curated illustrative sRGB anchors; not measured textile standards",
+  "colors": [
+    {
+      "id": "black",
+      "name": "Black",
+      "hex": "#101114",
+      "rgb": [
+        16,
+        17,
+        20
+      ],
+      "lab": [
+        5.07252,
+        0.27162,
+        -1.86183
+      ],
+      "laundryGroup": "darks",
+      "family": "neutral",
+      "aliases": [
+        "Jet Black"
+      ]
+    },
+    {
+      "id": "soft-black",
+      "name": "Soft Black",
+      "hex": "#242529",
+      "rgb": [
+        36,
+        37,
+        41
+      ],
+      "lab": [
+        14.72524,
+        0.57323,
+        -2.80284
+      ],
+      "laundryGroup": "darks",
+      "family": "neutral",
+      "aliases": [
+        "Washed Black"
+      ]
+    },
+    {
+      "id": "charcoal",
+      "name": "Charcoal",
+      "hex": "#383B40",
+      "rgb": [
+        56,
+        59,
+        64
+      ],
+      "lab": [
+        24.76128,
+        -0.05448,
+        -3.51855
+      ],
+      "laundryGroup": "darks",
+      "family": "neutral",
+      "aliases": [
+        "Anthracite"
+      ]
+    },
+    {
+      "id": "dark-gray",
+      "name": "Dark Gray",
+      "hex": "#55585D",
+      "rgb": [
+        85,
+        88,
+        93
+      ],
+      "lab": [
+        37.30032,
+        -0.07539,
+        -3.29732
+      ],
+      "laundryGroup": "darks",
+      "family": "neutral",
+      "aliases": [
+        "Dark Grey"
+      ]
+    },
+    {
+      "id": "gray",
+      "name": "Gray",
+      "hex": "#808287",
+      "rgb": [
+        128,
+        130,
+        135
+      ],
+      "lab": [
+        54.34769,
+        0.27692,
+        -2.95291
+      ],
+      "laundryGroup": "grays",
+      "family": "neutral",
+      "aliases": [
+        "Grey"
+      ]
+    },
+    {
+      "id": "light-gray",
+      "name": "Light Gray",
+      "hex": "#C5C7CB",
+      "rgb": [
+        197,
+        199,
+        203
+      ],
+      "lab": [
+        80.1958,
+        0.05801,
+        -2.23519
+      ],
+      "laundryGroup": "lights",
+      "family": "neutral",
+      "aliases": [
+        "Light Grey"
+      ]
+    },
+    {
+      "id": "silver-gray",
+      "name": "Silver Gray",
+      "hex": "#A9ADB3",
+      "rgb": [
+        169,
+        173,
+        179
+      ],
+      "lab": [
+        70.57802,
+        -0.2408,
+        -3.55965
+      ],
+      "laundryGroup": "grays",
+      "family": "neutral",
+      "aliases": [
+        "Silver"
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "lab": [
+        100,
+        -0.00002,
+        0.00001
+      ],
+      "laundryGroup": "whites",
+      "family": "neutral",
+      "aliases": [
+        "Pure White"
+      ]
+    },
+    {
+      "id": "off-white",
+      "name": "Off White",
+      "hex": "#F5F3EB",
+      "rgb": [
+        245,
+        243,
+        235
+      ],
+      "lab": [
+        95.79403,
+        -0.71582,
+        4.08536
+      ],
+      "laundryGroup": "lights",
+      "family": "neutral",
+      "aliases": [
+        "Off-white"
+      ]
+    },
+    {
+      "id": "cream",
+      "name": "Cream",
+      "hex": "#F3E5C3",
+      "rgb": [
+        243,
+        229,
+        195
+      ],
+      "lab": [
+        91.25006,
+        -0.59299,
+        18.31656
+      ],
+      "laundryGroup": "lights",
+      "family": "brown",
+      "aliases": [
+        "Vanilla"
+      ]
+    },
+    {
+      "id": "ivory",
+      "name": "Ivory",
+      "hex": "#F6EED7",
+      "rgb": [
+        246,
+        238,
+        215
+      ],
+      "lab": [
+        94.16213,
+        -1.09465,
+        12.09666
+      ],
+      "laundryGroup": "lights",
+      "family": "brown",
+      "aliases": [
+        "Ecru White"
+      ]
+    },
+    {
+      "id": "beige",
+      "name": "Beige",
+      "hex": "#D4BE9C",
+      "rgb": [
+        212,
+        190,
+        156
+      ],
+      "lab": [
+        78.00811,
+        2.59055,
+        20.04301
+      ],
+      "laundryGroup": "lights",
+      "family": "brown",
+      "aliases": [
+        "Sand"
+      ]
+    },
+    {
+      "id": "tan",
+      "name": "Tan",
+      "hex": "#B58B61",
+      "rgb": [
+        181,
+        139,
+        97
+      ],
+      "lab": [
+        60.91721,
+        10.57742,
+        28.56909
+      ],
+      "laundryGroup": "browns-beiges",
+      "family": "brown",
+      "aliases": [
+        "Camel"
+      ]
+    },
+    {
+      "id": "khaki",
+      "name": "Khaki",
+      "hex": "#A49A70",
+      "rgb": [
+        164,
+        154,
+        112
+      ],
+      "lab": [
+        63.4867,
+        -2.97739,
+        23.41906
+      ],
+      "laundryGroup": "browns-beiges",
+      "family": "brown",
+      "aliases": [
+        "Khaki Tan"
+      ]
+    },
+    {
+      "id": "taupe",
+      "name": "Taupe",
+      "hex": "#918477",
+      "rgb": [
+        145,
+        132,
+        119
+      ],
+      "lab": [
+        55.942,
+        2.64357,
+        8.80004
+      ],
+      "laundryGroup": "browns-beiges",
+      "family": "brown",
+      "aliases": [
+        "Mushroom"
+      ]
+    },
+    {
+      "id": "brown",
+      "name": "Brown",
+      "hex": "#805536",
+      "rgb": [
+        128,
+        85,
+        54
+      ],
+      "lab": [
+        40.16972,
+        14.2913,
+        25.19721
+      ],
+      "laundryGroup": "browns-beiges",
+      "family": "brown",
+      "aliases": [
+        "Chocolate Brown"
+      ]
+    },
+    {
+      "id": "dark-brown",
+      "name": "Dark Brown",
+      "hex": "#493225",
+      "rgb": [
+        73,
+        50,
+        37
+      ],
+      "lab": [
+        23.10648,
+        8.52019,
+        12.40355
+      ],
+      "laundryGroup": "darks",
+      "family": "brown",
+      "aliases": [
+        "Espresso"
+      ]
+    },
+    {
+      "id": "cocoa",
+      "name": "Cocoa",
+      "hex": "#9B765D",
+      "rgb": [
+        155,
+        118,
+        93
+      ],
+      "lab": [
+        52.63836,
+        11.01221,
+        19.36921
+      ],
+      "laundryGroup": "browns-beiges",
+      "family": "brown",
+      "aliases": [
+        "Light Brown"
+      ]
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "hex": "#C8323E",
+      "rgb": [
+        200,
+        50,
+        62
+      ],
+      "lab": [
+        45.51385,
+        58.73012,
+        29.63659
+      ],
+      "laundryGroup": "reds-pinks",
+      "family": "red",
+      "aliases": [
+        "True Red"
+      ]
+    },
+    {
+      "id": "bright-red",
+      "name": "Bright Red",
+      "hex": "#E32636",
+      "rgb": [
+        227,
+        38,
+        54
+      ],
+      "lab": [
+        49.48261,
+        69.31653,
+        40.23759
+      ],
+      "laundryGroup": "reds-pinks",
+      "family": "red",
+      "aliases": [
+        "Scarlet"
+      ]
+    },
+    {
+      "id": "dark-red",
+      "name": "Dark Red",
+      "hex": "#922C36",
+      "rgb": [
+        146,
+        44,
+        54
+      ],
+      "lab": [
+        34.35617,
+        43.32026,
+        18.38929
+      ],
+      "laundryGroup": "darks",
+      "family": "red",
+      "aliases": [
+        "Wine Red"
+      ]
+    },
+    {
+      "id": "burgundy",
+      "name": "Burgundy",
+      "hex": "#682D40",
+      "rgb": [
+        104,
+        45,
+        64
+      ],
+      "lab": [
+        27.27144,
+        28.63885,
+        0.88732
+      ],
+      "laundryGroup": "darks",
+      "family": "red",
+      "aliases": [
+        "Wine"
+      ]
+    },
+    {
+      "id": "maroon",
+      "name": "Maroon",
+      "hex": "#632F32",
+      "rgb": [
+        99,
+        47,
+        50
+      ],
+      "lab": [
+        26.49601,
+        23.76539,
+        9.01133
+      ],
+      "laundryGroup": "darks",
+      "family": "red",
+      "aliases": [
+        "Oxblood"
+      ]
+    },
+    {
+      "id": "pink",
+      "name": "Pink",
+      "hex": "#E68DA9",
+      "rgb": [
+        230,
+        141,
+        169
+      ],
+      "lab": [
+        68.56311,
+        37.29513,
+        -0.26023
+      ],
+      "laundryGroup": "reds-pinks",
+      "family": "red",
+      "aliases": [
+        "Rose Pink"
+      ]
+    },
+    {
+      "id": "light-pink",
+      "name": "Light Pink",
+      "hex": "#F3C6D3",
+      "rgb": [
+        243,
+        198,
+        211
+      ],
+      "lab": [
+        84.04288,
+        17.96628,
+        -0.42748
+      ],
+      "laundryGroup": "reds-pinks",
+      "family": "red",
+      "aliases": [
+        "Baby Pink"
+      ]
+    },
+    {
+      "id": "dusty-rose",
+      "name": "Dusty Rose",
+      "hex": "#BD8290",
+      "rgb": [
+        189,
+        130,
+        144
+      ],
+      "lab": [
+        60.6044,
+        24.75703,
+        1.72101
+      ],
+      "laundryGroup": "reds-pinks",
+      "family": "red",
+      "aliases": [
+        "Muted Rose"
+      ]
+    },
+    {
+      "id": "hot-pink",
+      "name": "Hot Pink",
+      "hex": "#D93683",
+      "rgb": [
+        217,
+        54,
+        131
+      ],
+      "lab": [
+        50.72586,
+        67.44146,
+        -4.66755
+      ],
+      "laundryGroup": "reds-pinks",
+      "family": "red",
+      "aliases": [
+        "Fuchsia Pink"
+      ]
+    },
+    {
+      "id": "coral",
+      "name": "Coral",
+      "hex": "#EB8174",
+      "rgb": [
+        235,
+        129,
+        116
+      ],
+      "lab": [
+        65.45817,
+        39.35331,
+        25.22348
+      ],
+      "laundryGroup": "yellows-oranges",
+      "family": "orange",
+      "aliases": [
+        "Coral Pink"
+      ]
+    },
+    {
+      "id": "orange",
+      "name": "Orange",
+      "hex": "#E67E32",
+      "rgb": [
+        230,
+        126,
+        50
+      ],
+      "lab": [
+        63.32609,
+        34.86278,
+        56.46698
+      ],
+      "laundryGroup": "yellows-oranges",
+      "family": "orange",
+      "aliases": [
+        "Tangerine"
+      ]
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "hex": "#AC5235",
+      "rgb": [
+        172,
+        82,
+        53
+      ],
+      "lab": [
+        45.72282,
+        34.65752,
+        33.91915
+      ],
+      "laundryGroup": "yellows-oranges",
+      "family": "orange",
+      "aliases": [
+        "Burnt Orange"
+      ]
+    },
+    {
+      "id": "peach",
+      "name": "Peach",
+      "hex": "#F3BE9A",
+      "rgb": [
+        243,
+        190,
+        154
+      ],
+      "lab": [
+        80.85982,
+        14.28325,
+        25.4771
+      ],
+      "laundryGroup": "lights",
+      "family": "orange",
+      "aliases": [
+        "Apricot"
+      ]
+    },
+    {
+      "id": "yellow",
+      "name": "Yellow",
+      "hex": "#EFD45B",
+      "rgb": [
+        239,
+        212,
+        91
+      ],
+      "lab": [
+        85.09625,
+        -4.39873,
+        61.65114
+      ],
+      "laundryGroup": "lights",
+      "family": "yellow",
+      "aliases": [
+        "Golden Yellow"
+      ]
+    },
+    {
+      "id": "pale-yellow",
+      "name": "Pale Yellow",
+      "hex": "#F4E9AC",
+      "rgb": [
+        244,
+        233,
+        172
+      ],
+      "lab": [
+        91.90478,
+        -5.35111,
+        31.06094
+      ],
+      "laundryGroup": "lights",
+      "family": "yellow",
+      "aliases": [
+        "Butter Yellow"
+      ]
+    },
+    {
+      "id": "mustard",
+      "name": "Mustard",
+      "hex": "#B89A37",
+      "rgb": [
+        184,
+        154,
+        55
+      ],
+      "lab": [
+        64.62721,
+        0.35529,
+        53.84183
+      ],
+      "laundryGroup": "yellows-oranges",
+      "family": "yellow",
+      "aliases": [
+        "Ochre"
+      ]
+    },
+    {
+      "id": "olive",
+      "name": "Olive",
+      "hex": "#737347",
+      "rgb": [
+        115,
+        115,
+        71
+      ],
+      "lab": [
+        47.44525,
+        -7.30157,
+        24.37379
+      ],
+      "laundryGroup": "greens",
+      "family": "green",
+      "aliases": [
+        "Olive Green"
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green",
+      "hex": "#46845B",
+      "rgb": [
+        70,
+        132,
+        91
+      ],
+      "lab": [
+        50.16725,
+        -29.82374,
+        16.0804
+      ],
+      "laundryGroup": "greens",
+      "family": "green",
+      "aliases": [
+        "Medium Green"
+      ]
+    },
+    {
+      "id": "dark-green",
+      "name": "Dark Green",
+      "hex": "#294F3D",
+      "rgb": [
+        41,
+        79,
+        61
+      ],
+      "lab": [
+        30.39994,
+        -18.41883,
+        6.47635
+      ],
+      "laundryGroup": "darks",
+      "family": "green",
+      "aliases": [
+        "Forest Green"
+      ]
+    },
+    {
+      "id": "emerald",
+      "name": "Emerald",
+      "hex": "#24836A",
+      "rgb": [
+        36,
+        131,
+        106
+      ],
+      "lab": [
+        49.06508,
+        -33.55532,
+        5.69131
+      ],
+      "laundryGroup": "greens",
+      "family": "green",
+      "aliases": [
+        "Emerald Green"
+      ]
+    },
+    {
+      "id": "sage",
+      "name": "Sage",
+      "hex": "#A2AF95",
+      "rgb": [
+        162,
+        175,
+        149
+      ],
+      "lab": [
+        69.83201,
+        -9.3641,
+        11.81075
+      ],
+      "laundryGroup": "greens",
+      "family": "green",
+      "aliases": [
+        "Sage Green"
+      ]
+    },
+    {
+      "id": "mint",
+      "name": "Mint",
+      "hex": "#B4DDC5",
+      "rgb": [
+        180,
+        221,
+        197
+      ],
+      "lab": [
+        84.71298,
+        -18.07276,
+        7.37501
+      ],
+      "laundryGroup": "lights",
+      "family": "green",
+      "aliases": [
+        "Mint Green"
+      ]
+    },
+    {
+      "id": "teal",
+      "name": "Teal",
+      "hex": "#327D80",
+      "rgb": [
+        50,
+        125,
+        128
+      ],
+      "lab": [
+        48.13703,
+        -21.88797,
+        -8.5635
+      ],
+      "laundryGroup": "greens",
+      "family": "green",
+      "aliases": [
+        "Blue Green"
+      ]
+    },
+    {
+      "id": "dark-teal",
+      "name": "Dark Teal",
+      "hex": "#27545C",
+      "rgb": [
+        39,
+        84,
+        92
+      ],
+      "lab": [
+        33.01489,
+        -12.8728,
+        -9.38563
+      ],
+      "laundryGroup": "darks",
+      "family": "green",
+      "aliases": [
+        "Deep Teal"
+      ]
+    },
+    {
+      "id": "turquoise",
+      "name": "Turquoise",
+      "hex": "#56B8BA",
+      "rgb": [
+        86,
+        184,
+        186
+      ],
+      "lab": [
+        69.32809,
+        -27.9769,
+        -9.76751
+      ],
+      "laundryGroup": "blues",
+      "family": "blue",
+      "aliases": [
+        "Aqua"
+      ]
+    },
+    {
+      "id": "light-blue",
+      "name": "Light Blue",
+      "hex": "#B0CDE4",
+      "rgb": [
+        176,
+        205,
+        228
+      ],
+      "lab": [
+        81.01183,
+        -4.71577,
+        -14.58404
+      ],
+      "laundryGroup": "lights",
+      "family": "blue",
+      "aliases": [
+        "Baby Blue"
+      ]
+    },
+    {
+      "id": "sky-blue",
+      "name": "Sky Blue",
+      "hex": "#78B2D7",
+      "rgb": [
+        120,
+        178,
+        215
+      ],
+      "lab": [
+        69.99176,
+        -9.13329,
+        -24.55494
+      ],
+      "laundryGroup": "blues",
+      "family": "blue",
+      "aliases": [
+        "Azure Blue"
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "hex": "#417BAD",
+      "rgb": [
+        65,
+        123,
+        173
+      ],
+      "lab": [
+        49.86428,
+        -3.27737,
+        -32.23089
+      ],
+      "laundryGroup": "blues",
+      "family": "blue",
+      "aliases": [
+        "Medium Blue"
+      ]
+    },
+    {
+      "id": "royal-blue",
+      "name": "Royal Blue",
+      "hex": "#3657AD",
+      "rgb": [
+        54,
+        87,
+        173
+      ],
+      "lab": [
+        38.927,
+        17.30939,
+        -49.62673
+      ],
+      "laundryGroup": "blues",
+      "family": "blue",
+      "aliases": [
+        "Cobalt"
+      ]
+    },
+    {
+      "id": "navy",
+      "name": "Navy",
+      "hex": "#202E4D",
+      "rgb": [
+        32,
+        46,
+        77
+      ],
+      "lab": [
+        19.21049,
+        4.6808,
+        -20.93296
+      ],
+      "laundryGroup": "darks",
+      "family": "blue",
+      "aliases": [
+        "Navy Blue"
+      ]
+    },
+    {
+      "id": "dark-blue",
+      "name": "Dark Blue",
+      "hex": "#2C4266",
+      "rgb": [
+        44,
+        66,
+        102
+      ],
+      "lab": [
+        27.82034,
+        3.14916,
+        -23.7428
+      ],
+      "laundryGroup": "darks",
+      "family": "blue",
+      "aliases": [
+        "Deep Blue"
+      ]
+    },
+    {
+      "id": "denim-blue",
+      "name": "Denim Blue",
+      "hex": "#526F88",
+      "rgb": [
+        82,
+        111,
+        136
+      ],
+      "lab": [
+        45.55126,
+        -3.74568,
+        -17.08292
+      ],
+      "laundryGroup": "blues",
+      "family": "blue",
+      "aliases": [
+        "Denim"
+      ]
+    },
+    {
+      "id": "faded-denim",
+      "name": "Faded Denim",
+      "hex": "#8DA5B8",
+      "rgb": [
+        141,
+        165,
+        184
+      ],
+      "lab": [
+        66.54484,
+        -4.05954,
+        -12.54496
+      ],
+      "laundryGroup": "blues",
+      "family": "blue",
+      "aliases": [
+        "Washed Denim"
+      ]
+    },
+    {
+      "id": "indigo",
+      "name": "Indigo",
+      "hex": "#414568",
+      "rgb": [
+        65,
+        69,
+        104
+      ],
+      "lab": [
+        30.3499,
+        7.84564,
+        -20.95164
+      ],
+      "laundryGroup": "darks",
+      "family": "blue",
+      "aliases": [
+        "Indigo Blue"
+      ]
+    },
+    {
+      "id": "purple",
+      "name": "Purple",
+      "hex": "#795387",
+      "rgb": [
+        121,
+        83,
+        135
+      ],
+      "lab": [
+        41.21788,
+        25.66366,
+        -22.87006
+      ],
+      "laundryGroup": "other",
+      "family": "purple",
+      "aliases": [
+        "Violet"
+      ]
+    },
+    {
+      "id": "dark-purple",
+      "name": "Dark Purple",
+      "hex": "#503653",
+      "rgb": [
+        80,
+        54,
+        83
+      ],
+      "lab": [
+        26.64493,
+        17.33615,
+        -12.99432
+      ],
+      "laundryGroup": "darks",
+      "family": "purple",
+      "aliases": [
+        "Aubergine"
+      ]
+    },
+    {
+      "id": "plum",
+      "name": "Plum",
+      "hex": "#765568",
+      "rgb": [
+        118,
+        85,
+        104
+      ],
+      "lab": [
+        40.16145,
+        16.97434,
+        -5.50963
+      ],
+      "laundryGroup": "other",
+      "family": "purple",
+      "aliases": [
+        "Muted Purple"
+      ]
+    },
+    {
+      "id": "lavender",
+      "name": "Lavender",
+      "hex": "#C5B3DC",
+      "rgb": [
+        197,
+        179,
+        220
+      ],
+      "lab": [
+        75.62392,
+        14.17037,
+        -18.23655
+      ],
+      "laundryGroup": "lights",
+      "family": "purple",
+      "aliases": [
+        "Lilac"
+      ]
+    },
+    {
+      "id": "pale-lavender",
+      "name": "Pale Lavender",
+      "hex": "#DDD3EB",
+      "rgb": [
+        221,
+        211,
+        235
+      ],
+      "lab": [
+        85.9859,
+        7.82882,
+        -10.53652
+      ],
+      "laundryGroup": "lights",
+      "family": "purple",
+      "aliases": [
+        "Pastel Purple"
+      ]
+    }
+  ]
+}

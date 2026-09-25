@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "configVersion": "1.0.0",
+  "colorSpace": "CIELAB-D65-2deg",
+  "input": {
+    "maxFileBytes": 20971520,
+    "maxMegapixels": 24,
+    "workingMaxEdge": 2048,
+    "cropMaxEdge": 1024,
+    "minRoiPixels": 64,
+    "minPatchPixels": 16,
+    "maxTargetAspect": 4
+  },
+  "sampling": {
+    "gridSize": 64,
+    "primarySeed": 1,
+    "stabilitySeed": 2,
+    "alphaMin": 250,
+    "minValidSamples": 1024,
+    "nearBlackMax": 3,
+    "nearWhiteMin": 252,
+    "channelClipMin": 252
+  },
+  "clustering": {
+    "maxK": 5,
+    "maxIterations": 12,
+    "convergenceDE76": 0.2,
+    "penaltyPerCluster": 4,
+    "mergeBelow": 6
+  },
+  "artifacts": {
+    "maxComponentFraction": 0.02,
+    "highlightMinL": 97,
+    "highlightMaxC": 5,
+    "shadowMaxL": 3,
+    "minRemainingFraction": 0.5
+  },
+  "matching": {
+    "distanceMethod": "ciede2000",
+    "topMatches": 3,
+    "uncertainAbove": 10,
+    "unrecognizedAbove": 18,
+    "profilePenalty": 2
+  },
+  "multicolor": {
+    "significantFraction": 0.15,
+    "accentMinFraction": 0.08,
+    "pairMinDistance": 15,
+    "minSignificantCoverage": 0.7,
+    "diagnosticSize": 128,
+    "sharpEdgeMinDE76": 8,
+    "occupancyGrid": 4,
+    "cellOccupancyFraction": 0.1,
+    "strongSharpFraction": 0.35,
+    "spreadSharpFraction": 0.2,
+    "spreadMinCells": 6,
+    "stabilityMaxProportionDelta": 0.1,
+    "lightingMinDeltaL": 15,
+    "lightingMaxChromaDistance": 6,
+    "mixedLargestBelow": 0.5,
+    "channelClipFlagFraction": 0.2
+  },
+  "confidence": {
+    "weights": {
+      "fit": 0.35,
+      "margin": 0.2,
+      "compact": 0.15,
+      "stability": 0.15,
+      "quality": 0.15
+    },
+    "fitScale": 10,
+    "marginScale": 6,
+    "compactScale": 8,
+    "stabilityScale": 8,
+    "qualityPenalty": 0.35,
+    "qualityClipScale": 0.5,
+    "caps": {
+      "uncalibrated": 85,
+      "calibrated": 95,
+      "nearClipping": 65,
+      "nearClippingFraction": 0.2,
+      "poorFit": 60,
+      "poorFitAbove": 10,
+      "closeCall": 55,
+      "closeCallBelow": 1,
+      "multicolor": 85,
+      "lightingAmbiguity": 70,
+      "patternAmbiguous": 55,
+      "mixedColors": 60,
+      "groupBoundary": 60
+    },
+    "labels": {
+      "high": 80,
+      "moderate": 60
+    },
+    "groupNoteDifference": 15
+  },
+  "grouping": {
+    "presetId": "standard",
+    "presetName": "Standard color sorting",
+    "presetVersion": "standard-1.0.0",
+    "whites": {
+      "minL": 94,
+      "maxC": 4
+    },
+    "darks": {
+      "maxL": 38
+    },
+    "lights": {
+      "minL": 75
+    },
+    "boundary": {
+      "deltaL": 2,
+      "deltaC": 1
+    },
+    "familyGroups": {
+      "neutral": "grays",
+      "blue": "blues",
+      "green": "greens",
+      "yellow": "yellows-oranges",
+      "orange": "yellows-oranges",
+      "brown": "browns-beiges",
+      "red": "reds-pinks",
+      "purple": "other"
+    }
+  },
+  "calibration": {
+    "gridSize": 64,
+    "minSamples": 256,
+    "minMedianEncoded": 40,
+    "maxMedianEncoded": 245,
+    "maxClippedFraction": 0.02,
+    "maxMadLinear": 0.03,
+    "minGain": 0.67,
+    "maxGain": 1.5,
+    "maxNewlyClippedFraction": 0.05,
+    "liveTtlMs": 120000
+  },
+  "profiles": {
+    "minLargestFraction": 0.85,
+    "maxSpread": 6,
+    "maxSeedDistance": 12,
+    "maxClippingFraction": 0.05,
+    "maxActivePerColor": 20,
+    "duplicateBelow": 2
+  },
+  "liveFeedback": {
+    "intervalMs": 500,
+    "gridSize": 32
+  }
+}
