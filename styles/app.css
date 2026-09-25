@@ -109,6 +109,9 @@ textarea {
   position: absolute !important;
   width: 1px;
   height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
@@ -320,6 +323,17 @@ textarea {
   grid-column: 1 / -1;
 }
 
+.actionbar .btn {
+  padding-inline: 0.75rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .actionbar .btn .icon {
+    display: none;
+  }
+}
+
 /* ---------- Home ---------- */
 
 .screen--home {
@@ -357,13 +371,15 @@ textarea {
 }
 
 .privacy-note {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   color: var(--text-muted);
   font-size: 0.9375rem;
   text-align: center;
+  text-wrap: balance;
+}
+
+.privacy-note .icon {
+  margin-right: 0.35em;
+  vertical-align: -0.2em;
 }
 
 .banner {

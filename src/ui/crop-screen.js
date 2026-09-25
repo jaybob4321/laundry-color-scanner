@@ -56,7 +56,7 @@ export function createCropScreen(app) {
     const image = app.state.image;
     app.state.patchEnabled = enabled;
     patchBtn.setAttribute('aria-pressed', String(enabled));
-    patchBtn.lastChild.textContent = enabled ? ' Remove white reference' : ' Add white reference';
+    patchBtn.lastChild.textContent = enabled ? 'Remove white reference' : 'Add white reference';
     patchHint.hidden = !enabled;
     patch?.remove();
     patch = null;

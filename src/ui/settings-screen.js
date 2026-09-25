@@ -51,8 +51,22 @@ export function createSettingsScreen(app) {
   }
 
   function groupingSection() {
-    const settings = app.settings.grouping;
     const preset = app.config.grouping;
+    // Handlers read app.settings.grouping at change time (never a render-time
+    // snapshot), and update labels in place so keyboard focus is kept.
+    const current = () => app.settings.grouping;
+    const automaticOptions = new Map();
+    const summary = h('summary', { class: 'field-label' });
+    const refreshLabels = () => {
+      const rules = app.rules({ withoutColorOverrides: true });
+      for (const [colorId, option] of automaticOptions) {
+        const color = app.palette.byId.get(colorId);
+        option.textContent = `Automatic (${groupLabel(groupForColor(color.lab, color.family, color.id, rules).groupId)})`;
+      }
+      const count = Object.keys(current().colorOverrides ?? {}).length;
+      summary.textContent = `Per-color overrides${count ? ` (${count})` : ''}`;
+    };
+
     const families = h(
       'div',
       { class: 'override-grid' },
@@ -62,47 +76,46 @@ export function createSettingsScreen(app) {
           { class: 'override-row' },
           h('span', { 'aria-hidden': 'true' }),
           h('span', { text: FAMILY_LABELS[family] }),
-          groupSelect(settings.familyGroups?.[family] ?? preset.familyGroups[family], (value) =>
-            saveGrouping({ ...settings, familyGroups: { ...settings.familyGroups, [family]: value } }),
-          ),
+          groupSelect(current().familyGroups?.[family] ?? preset.familyGroups[family], async (value) => {
+            await saveGrouping({ ...current(), familyGroups: { ...current().familyGroups, [family]: value } });
+            refreshLabels();
+          }),
         ),
       ),
     );
-    const standardRules = app.rules({ standard: true });
     const overrides = h(
       'div',
       { class: 'override-grid' },
       ...app.palette.colors.map((color) => {
-        const auto = groupForColor(color.lab, color.family, color.id, standardRules).groupId;
-        return h(
-          'label',
-          { class: 'override-row' },
-          swatch(color.rgb, { small: true }),
-          h('span', { text: color.name }),
-          groupSelect(
-            settings.colorOverrides?.[color.id] ?? null,
-            (value) => {
-              const colorOverrides = { ...settings.colorOverrides };
-              if (value) colorOverrides[color.id] = value;
-              else delete colorOverrides[color.id];
-              saveGrouping({ ...settings, colorOverrides });
-            },
-            { automaticLabel: `Automatic (${groupLabel(auto)})` },
-          ),
+        const select = groupSelect(
+          current().colorOverrides?.[color.id] ?? null,
+          async (value) => {
+            const colorOverrides = { ...current().colorOverrides };
+            if (value) colorOverrides[color.id] = value;
+            else delete colorOverrides[color.id];
+            await saveGrouping({ ...current(), colorOverrides });
+            refreshLabels();
+          },
+          { automaticLabel: 'Automatic' },
         );
+        automaticOptions.set(color.id, select.options[0]);
+        return h('label', { class: 'override-row' }, swatch(color.rgb, { small: true }), h('span', { text: color.name }), select);
       }),
     );
-    const overrideCount = Object.keys(settings.colorOverrides ?? {}).length;
+    refreshLabels();
     return section(
       'Laundry groups',
       h('p', { class: 'hint', text: `${preset.presetName} (${preset.presetVersion}). Whites need very light, nearly colorless fabric; dark colors sort as Darks; very light colors sort as Lights; reds and pinks always stay together unless dark. Changes apply to new scans only.` }),
       h('h4', { class: 'field-label', text: 'Where each color family goes' }),
       families,
-      h('details', {}, h('summary', { class: 'field-label', text: `Per-color overrides${overrideCount ? ` (${overrideCount})` : ''}` }), overrides),
+      h('details', {}, summary, overrides),
       h('button', {
         class: 'btn btn--secondary btn--small',
         type: 'button',
-        onClick: () => saveGrouping({ familyGroups: {}, colorOverrides: {} }, 'Restored standard color sorting.'),
+        onClick: async () => {
+          await saveGrouping({ familyGroups: {}, colorOverrides: {} }, 'Restored standard color sorting.');
+          render();
+        },
       }, 'Restore standard sorting'),
     );
   }
@@ -291,14 +304,23 @@ export function createSettingsScreen(app) {
     );
   }
 
-  function offlineSection() {
+  const offlineBody = h('div', { class: 'stack' });
+
+  /** Refresh only the offline/install status (never the whole page, which would drop focus). */
+  function renderOffline() {
     const status = app.pwa.describe();
-    return section(
-      'Offline use',
-      h('p', { text: status.text }),
-      status.canInstall ? h('button', { class: 'btn btn--secondary btn--small', type: 'button', onClick: () => app.pwa.promptInstall() }, icon('download'), 'Install app') : null,
-      status.installHint ? h('p', { class: 'hint', text: status.installHint }) : null,
+    clear(offlineBody).append(
+      ...[
+        h('p', { text: status.text }),
+        status.canInstall ? h('button', { class: 'btn btn--secondary btn--small', type: 'button', onClick: () => app.pwa.promptInstall() }, icon('download'), 'Install app') : null,
+        status.installHint ? h('p', { class: 'hint', text: status.installHint }) : null,
+      ].filter(Boolean),
     );
+  }
+
+  function offlineSection() {
+    renderOffline();
+    return section('Offline use', offlineBody);
   }
 
   function developerSection() {
@@ -344,6 +366,7 @@ export function createSettingsScreen(app) {
       $('#settings-title').focus?.();
     },
     render,
+    renderOffline,
     cancel() {
       app.go('home');
     },

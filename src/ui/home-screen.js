@@ -12,7 +12,7 @@ export function createHomeScreen(app) {
   const privacyText = app.aiEnabled
     ? 'Photos stay on this device unless you choose AI review.'
     : 'Photos are analyzed on this device and never uploaded.';
-  privacy.lastChild.textContent = ` ${privacyText}`;
+  privacy.lastChild.textContent = privacyText;
 
   return {
     enter() {

@@ -129,6 +129,33 @@ test('reference profile: quality gates preview and saving numbers only', async (
   await context.close();
 });
 
+test('grouping settings: successive changes all persist, keep focus, and apply to new scans', async () => {
+  const { page, errors, context } = await openPage(browser, app.baseUrl);
+  await page.click('#btn-settings');
+  const row = (name) => page.locator('.override-row').filter({ has: page.locator('span', { hasText: new RegExp(`^${name}$`) }) });
+  const purples = row('Purples').locator('select');
+  await purples.focus(); // selectOption() alone doesn't move focus
+  await purples.selectOption('darks');
+  await page.waitForFunction(() => window.__lcs.settings.grouping.familyGroups.purple === 'darks');
+  assert.equal(await page.evaluate(() => document.activeElement?.tagName), 'SELECT', 'focus kept after saving');
+  await page.click('summary:has-text("Per-color overrides")');
+  assert.equal(await row('Purple').locator('option').first().textContent(), 'Automatic (Darks)');
+  await row('Lavender').locator('select').selectOption('other');
+  await page.waitForFunction(() => window.__lcs.settings.grouping.colorOverrides.lavender === 'other');
+  const stored = await page.evaluate(() => window.__lcs.storage.getSetting('grouping'));
+  assert.deepEqual(stored.familyGroups, { purple: 'darks' }, 'first change not overwritten by the second');
+  assert.deepEqual(stored.colorOverrides, { lavender: 'other' });
+  assert.match(await page.textContent('summary:has-text("Per-color overrides")'), /\(1\)/);
+
+  await page.click('#btn-settings-back');
+  const r = await uploadAndAnalyze(page, pngFile('purple.png', solid('#795387', { width: 400, height: 400, noise: 2 })));
+  assert.equal(r.name, 'Purple');
+  assert.equal(r.group, 'Darks');
+  assert.match(r.result.groupingVersion, /^standard-1\.0\.0#[0-9a-f]{8}$/);
+  assert.deepEqual(errors, []);
+  await context.close();
+});
+
 test('storage unavailable: scanning still works and saving says so', async () => {
   const { page, errors, context } = await openPage(browser, app.baseUrl, {
     initScript: () => Object.defineProperty(window, 'indexedDB', { get: () => undefined }),

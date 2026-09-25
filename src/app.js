@@ -63,7 +63,14 @@ const app = {
 
 // ---------- derived helpers used by screens ----------
 
-app.rules = ({ standard = false } = {}) => resolveGroupingRules(app.config.grouping, standard ? null : app.settings.grouping, app.palette);
+/**
+ * Effective grouping rules. `withoutColorOverrides` gives what "Automatic"
+ * means for a color: the preset plus the user's family mappings.
+ */
+app.rules = ({ withoutColorOverrides = false } = {}) => {
+  const settings = withoutColorOverrides ? { familyGroups: app.settings.grouping.familyGroups } : app.settings.grouping;
+  return resolveGroupingRules(app.config.grouping, settings, app.palette);
+};
 app.groupingVersion = () => groupingVersion(app.rules());
 app.debugEnabled = () => APP_CONFIG.debugAvailable && (app.settings.debug || params.get('debug') === '1');
 
@@ -318,7 +325,6 @@ app.updateGroupingSettings = async (next) => {
   // Apply for this session even if it can't be saved (storage failures never block scanning).
   app.settings.grouping = { ...DEFAULT_GROUPING, ...next };
   configureDetector();
-  app.screens.settings.render();
   await app.storage.setSetting('grouping', app.settings.grouping);
 };
 
@@ -348,7 +354,7 @@ function renderPwaStatus() {
   $('#btn-install').hidden = !described.canInstall;
   $('#install-hint').hidden = !described.installHint;
   $('#install-hint-text').textContent = described.installHint ?? '';
-  if (app.state.screen === 'settings') app.screens.settings.render();
+  if (app.state.screen === 'settings') app.screens.settings.renderOffline();
 }
 
 // ---------- boot ----------

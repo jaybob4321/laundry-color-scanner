@@ -28,9 +28,44 @@ function dist2Point(labs, i, p) {
   return dL * dL + da * da + db * db;
 }
 
-function medianOfSorted(values) {
-  const m = values.length >> 1;
-  return values.length % 2 ? values[m] : (values[m - 1] + values[m]) / 2;
+/**
+ * k-th smallest value of `a` (in place, Hoare quickselect, O(n) expected).
+ * On return a[0..k-1] <= a[k] <= a[k+1..], so the exact median needs no sort.
+ */
+function selectKth(a, k) {
+  let lo = 0;
+  let hi = a.length - 1;
+  while (hi > lo) {
+    const pivot = a[(lo + hi) >> 1];
+    let i = lo;
+    let j = hi;
+    while (i <= j) {
+      while (a[i] < pivot) i++;
+      while (a[j] > pivot) j--;
+      if (i <= j) {
+        const t = a[i];
+        a[i] = a[j];
+        a[j] = t;
+        i++;
+        j--;
+      }
+    }
+    if (k <= j) hi = j;
+    else if (k >= i) lo = i;
+    else break;
+  }
+  return a[k];
+}
+
+/** Exact median (mean of the two middle values for even counts). Reorders `values`. */
+export function medianInPlace(values) {
+  const n = values.length;
+  const m = n >> 1;
+  const upper = selectKth(values, m);
+  if (n % 2) return upper;
+  let lower = -Infinity;
+  for (let i = 0; i < m; i++) if (values[i] > lower) lower = values[i];
+  return (lower + upper) / 2;
 }
 
 /** Component-wise median of the samples listed in `indices` (or all n). */
@@ -44,10 +79,7 @@ export function componentMedian(labs, indices, n = indices ? indices.length : la
     A[k] = labs[i * 3 + 1];
     B[k] = labs[i * 3 + 2];
   }
-  L.sort();
-  A.sort();
-  B.sort();
-  return [medianOfSorted(L), medianOfSorted(A), medianOfSorted(B)];
+  return [medianInPlace(L), medianInPlace(A), medianInPlace(B)];
 }
 
 /** Index of the sample nearest `point`; ties resolve to the earliest listed. */
@@ -110,13 +142,23 @@ export function farthestPointSeeds(labs, n, kMax, firstIndex) {
   return { centers, k };
 }
 
+// Hot loop: distances inlined (same arithmetic and tie-breaking as dist2).
 function assign(labs, n, centers, k, labels, resid) {
   let sse = 0;
-  for (let i = 0; i < n; i++) {
+  for (let i = 0, p = 0; i < n; i++, p += 3) {
+    const L = labs[p];
+    const A = labs[p + 1];
+    const B = labs[p + 2];
+    let dL = L - centers[0];
+    let da = A - centers[1];
+    let db = B - centers[2];
+    let bestD = dL * dL + da * da + db * db;
     let best = 0;
-    let bestD = dist2(labs, i, centers, 0);
-    for (let c = 1; c < k; c++) {
-      const d = dist2(labs, i, centers, c);
+    for (let c = 1, q = 3; c < k; c++, q += 3) {
+      dL = L - centers[q];
+      da = A - centers[q + 1];
+      db = B - centers[q + 2];
+      const d = dL * dL + da * da + db * db;
       if (d < bestD) {
         bestD = d;
         best = c;
