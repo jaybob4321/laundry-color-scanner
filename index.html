@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Laundry Color Scanner</title>
+  <meta name="description" content="Point your phone camera at clothing to get its color name and a laundry sorting suggestion. Photos are analyzed on your device.">
+  <meta name="theme-color" content="#0b5f86">
+  <meta name="color-scheme" content="light dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Laundry Colors">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles/app.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <noscript><p class="noscript">Laundry Color Scanner needs JavaScript to analyze photos on your device.</p></noscript>
+
+  <main id="main" tabindex="-1">
+    <!-- Home -->
+    <section id="screen-home" class="screen screen--home" data-screen="home" aria-labelledby="home-title">
+      <div class="home-hero">
+        <img class="home-logo" src="assets/icons/icon-192.png" alt="" width="88" height="88">
+        <h1 id="home-title">Laundry Color Scanner</h1>
+        <p class="lede">Point your camera at a garment to get its color name and a laundry sorting suggestion.</p>
+      </div>
+      <div class="home-actions">
+        <button id="btn-scan" class="btn btn--primary btn--xl" type="button" data-icon="camera">Scan Clothing</button>
+        <button id="btn-upload" class="btn btn--secondary btn--xl" type="button" data-icon="image">Upload Photo</button>
+        <input id="file-input" type="file" accept="image/*" hidden>
+      </div>
+      <p id="privacy-note" class="privacy-note" data-icon="lock">Photos are analyzed on this device and never uploaded.</p>
+      <div id="update-banner" class="banner banner--info" role="status" hidden>
+        <span>An update is available.</span>
+        <button id="btn-apply-update" class="btn btn--small btn--primary" type="button">Reload to update</button>
+      </div>
+      <div id="install-hint" class="banner banner--info" hidden>
+        <span id="install-hint-text"></span>
+      </div>
+      <footer class="home-footer">
+        <span id="offline-status" class="status-chip" role="status">Checking offline support…</span>
+        <div class="home-footer-actions">
+          <button id="btn-install" class="btn btn--ghost btn--small" type="button" data-icon="download" hidden>Install app</button>
+          <button id="btn-settings" class="btn btn--ghost btn--small" type="button" data-icon="settings">Settings</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- Camera -->
+    <section id="screen-camera" class="screen screen--camera" data-screen="camera" aria-label="Camera" hidden>
+      <div id="camera-stage" class="camera-stage">
+        <video id="camera-video" autoplay muted playsinline disablepictureinpicture aria-hidden="true"></video>
+        <div id="camera-target" class="camera-target" aria-hidden="true"><span></span></div>
+        <div class="camera-topbar">
+          <button id="btn-camera-cancel" class="btn-icon" type="button" data-icon="close" aria-label="Cancel"></button>
+          <span id="camera-calibration" class="camera-chip" role="status" hidden></span>
+          <button id="btn-torch" class="btn-icon" type="button" data-icon="flash" aria-label="Flash" aria-pressed="false" hidden></button>
+        </div>
+        <div class="camera-guidance">
+          <p id="camera-instruction" class="camera-instruction">Fill the target with fabric; avoid skin and background.</p>
+          <p id="camera-feedback" class="camera-feedback" role="status" aria-live="polite"></p>
+        </div>
+        <div id="camera-message" class="camera-message" role="alert" hidden>
+          <h2 id="camera-message-title">Camera unavailable</h2>
+          <p id="camera-message-text"></p>
+          <div class="camera-message-actions">
+            <button id="btn-camera-retry" class="btn btn--primary" type="button">Try again</button>
+            <button id="btn-camera-upload" class="btn btn--secondary" type="button" data-icon="image">Upload Photo</button>
+          </div>
+        </div>
+      </div>
+      <div class="camera-controls">
+        <button id="btn-calibrate" class="camera-side-btn" type="button" data-icon="calibrate" aria-pressed="false">Calibrate</button>
+        <button id="btn-capture" class="shutter" type="button" aria-label="Capture"><span></span></button>
+        <button id="btn-camera-upload-alt" class="camera-side-btn" type="button" data-icon="image">Upload</button>
+      </div>
+    </section>
+
+    <!-- Crop / review -->
+    <section id="screen-crop" class="screen screen--crop" data-screen="crop" aria-labelledby="crop-title" hidden>
+      <header class="topbar">
+        <button id="btn-crop-cancel" class="btn btn--ghost btn--small" type="button" data-icon="back">Back</button>
+        <h2 id="crop-title">Adjust target</h2>
+        <span class="topbar-spacer"></span>
+      </header>
+      <p id="crop-hint" class="hint">Fill the target with fabric; avoid skin and background. Drag to move, drag the corner to resize.</p>
+      <div id="crop-stage" class="crop-stage">
+        <div id="crop-image" class="crop-image"></div>
+      </div>
+      <p id="crop-error" class="inline-error" role="alert" hidden></p>
+      <div class="crop-tools">
+        <button id="btn-toggle-patch" class="btn btn--secondary btn--small" type="button" data-icon="calibrate" aria-pressed="false">Add white reference</button>
+        <details class="numeric-crop">
+          <summary>Set target numerically</summary>
+          <div id="numeric-crop-fields" class="numeric-fields"></div>
+        </details>
+      </div>
+      <p id="patch-hint" class="hint" hidden>Place the dashed box on a matte white or gray card in the same light, outside the fabric target.</p>
+      <div class="actionbar">
+        <button id="btn-crop-retake" class="btn btn--secondary" type="button">Retake</button>
+        <button id="btn-crop-analyze" class="btn btn--primary" type="button">Analyze</button>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="screen-results" class="screen screen--results" data-screen="results" aria-labelledby="result-name" hidden>
+      <header class="topbar">
+        <button id="btn-results-home" class="btn btn--ghost btn--small" type="button" data-icon="home">Home</button>
+        <h2 class="topbar-title">Result</h2>
+        <button id="btn-results-adjust" class="btn btn--ghost btn--small" type="button" data-icon="crop">Adjust Target</button>
+      </header>
+      <div id="result-body" class="result-body"></div>
+      <div class="actionbar actionbar--sticky">
+        <button id="btn-scan-another" class="btn btn--primary" type="button" data-icon="camera">Scan Another</button>
+        <button id="btn-correct" class="btn btn--secondary" type="button" data-icon="edit">Correct Result</button>
+      </div>
+    </section>
+
+    <!-- Correction -->
+    <section id="screen-correction" class="screen screen--form" data-screen="correction" aria-labelledby="correction-title" hidden>
+      <header class="topbar">
+        <button id="btn-correction-cancel" class="btn btn--ghost btn--small" type="button" data-icon="back">Cancel</button>
+        <h2 id="correction-title">Correct result</h2>
+        <span class="topbar-spacer"></span>
+      </header>
+      <form id="correction-form" class="stack" novalidate>
+        <p class="hint">Choose the garment's actual color. Your correction is saved only on this device.</p>
+        <div id="correction-picker"></div>
+        <label class="field">
+          <span class="field-label">Laundry group</span>
+          <select id="correction-group" name="group"></select>
+        </label>
+        <label class="field">
+          <span class="field-label">Note <span class="optional">(optional)</span></span>
+          <textarea id="correction-note" name="note" rows="2" maxlength="500"></textarea>
+        </label>
+        <div class="actionbar actionbar--sticky">
+          <button id="btn-correction-save" class="btn btn--primary" type="submit" data-icon="check">Save correction</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Add reference -->
+    <section id="screen-reference" class="screen screen--form" data-screen="reference" aria-labelledby="reference-title" hidden>
+      <header class="topbar">
+        <button id="btn-reference-cancel" class="btn btn--ghost btn--small" type="button" data-icon="back">Cancel</button>
+        <h2 id="reference-title">Add reference</h2>
+        <span class="topbar-spacer"></span>
+      </header>
+      <form id="reference-form" class="stack" novalidate>
+        <p class="hint">Save this scan's measured color as a reference for a color you know. Only numbers are saved — never the photo.</p>
+        <div id="reference-picker"></div>
+        <fieldset class="field">
+          <legend class="field-label">Lighting when you scanned</legend>
+          <label class="choice"><input type="radio" name="condition" value="neutral"> Daylight or neutral indoor light</label>
+          <label class="choice"><input type="radio" name="condition" value="calibrated"> Calibrated with a white reference</label>
+          <label class="choice"><input type="radio" name="condition" value="unknown" checked> Unknown or mixed light</label>
+        </fieldset>
+        <div id="reference-preview" class="card" aria-live="polite"></div>
+        <div class="actionbar actionbar--sticky">
+          <button id="btn-reference-save" class="btn btn--primary" type="submit" data-icon="check">Save reference</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Settings -->
+    <section id="screen-settings" class="screen screen--form" data-screen="settings" aria-labelledby="settings-title" hidden>
+      <header class="topbar">
+        <button id="btn-settings-back" class="btn btn--ghost btn--small" type="button" data-icon="back">Back</button>
+        <h2 id="settings-title">Settings</h2>
+        <span class="topbar-spacer"></span>
+      </header>
+      <div id="settings-body" class="stack"></div>
+    </section>
+  </main>
+
+  <!-- Analyzing overlay -->
+  <div id="busy-overlay" class="overlay" hidden>
+    <div class="overlay-card" role="dialog" aria-modal="true" aria-labelledby="busy-text">
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="busy-text">Analyzing colors…</p>
+      <button id="btn-busy-cancel" class="btn btn--secondary btn--small" type="button">Cancel</button>
+    </div>
+  </div>
+
+  <dialog id="dialog" class="dialog" aria-labelledby="dialog-title">
+    <form method="dialog" class="dialog-form">
+      <h2 id="dialog-title"></h2>
+      <div id="dialog-body" class="dialog-body"></div>
+      <div class="dialog-actions">
+        <button id="dialog-cancel" class="btn btn--secondary" value="cancel" type="submit">Cancel</button>
+        <button id="dialog-confirm" class="btn btn--primary" value="confirm" type="submit">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="announcer" class="visually-hidden" aria-live="polite"></div>
+</body>
+</html>
