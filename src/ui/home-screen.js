@@ -14,10 +14,13 @@ export function createHomeScreen(app) {
     : 'Photos are analyzed on this device and never uploaded.';
   privacy.lastChild.textContent = privacyText;
 
+  let visited = false;
   return {
     enter() {
       app.releaseImage();
-      $('#home-title').focus?.();
+      // Move focus to the heading when returning Home (not on first load).
+      if (visited) $('#home-title').focus({ preventScroll: true });
+      visited = true;
     },
     cancel() {},
   };

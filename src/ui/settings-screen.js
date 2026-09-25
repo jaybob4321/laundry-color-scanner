@@ -363,7 +363,7 @@ export function createSettingsScreen(app) {
   return {
     enter() {
       render();
-      $('#settings-title').focus?.();
+      $('#settings-title').focus({ preventScroll: true });
     },
     render,
     renderOffline,
