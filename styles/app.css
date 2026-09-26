@@ -66,6 +66,20 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* App-like taps: no double-tap-to-zoom delay or swallowed taps on iOS;
+     pinch-zoom stays available for accessibility. */
+  touch-action: manipulation;
+}
+
+button,
+a,
+label,
+input,
+select,
+textarea,
+summary,
+.picker-option {
+  touch-action: manipulation;
 }
 
 body {
@@ -849,6 +863,8 @@ textarea {
 
 .small-label input {
   min-height: 44px;
+  /* iOS Safari zooms the page when a field under 16px gets focus. */
+  font-size: 1rem;
 }
 
 .choice {
@@ -1212,7 +1228,7 @@ textarea {
 
 .override-row {
   display: grid;
-  grid-template-columns: auto 1fr minmax(8.5rem, 45%);
+  grid-template-columns: auto minmax(0, 1fr) minmax(11.5rem, 55%);
   align-items: center;
   gap: 0.625rem;
 }

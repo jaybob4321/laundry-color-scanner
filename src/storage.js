@@ -16,6 +16,22 @@ export const DB_NAME = 'laundry-color-scanner';
 export const DB_VERSION = 1;
 const STORES = ['settings', 'corrections', 'profiles'];
 
+// Storage must never block scanning (blueprint §15): a hung IndexedDB (a
+// known Safari failure mode) degrades to "Could not save locally" instead.
+export const OPEN_TIMEOUT_MS = 4000;
+export const TX_TIMEOUT_MS = 5000;
+const IMPORT_TIMEOUT_MS = 60000;
+
+function withTimeout(promise, ms, message) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(message)), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+}
+
 export class StorageError extends Error {
   constructor(code, cause) {
     super(code);
@@ -62,11 +78,12 @@ function openDatabase(idb) {
 class IdbStorage {
   available = true;
 
-  constructor(db) {
+  constructor(db, { txTimeoutMs = TX_TIMEOUT_MS } = {}) {
     this.db = db;
+    this.txTimeoutMs = txTimeoutMs;
   }
 
-  async #tx(storeNames, mode, fn) {
+  async #tx(storeNames, mode, fn, timeoutMs = this.txTimeoutMs) {
     try {
       const tx = this.db.transaction(storeNames, mode);
       const done = new Promise((resolve, reject) => {
@@ -74,9 +91,13 @@ class IdbStorage {
         tx.onabort = () => reject(tx.error ?? new Error('aborted'));
         tx.onerror = () => reject(tx.error);
       });
-      const result = await fn(tx);
-      await done;
-      return result;
+      done.catch(() => {}); // observed below; avoid unhandled rejections on early failure
+      const work = (async () => {
+        const result = await fn(tx);
+        await done;
+        return result;
+      })();
+      return await withTimeout(work, timeoutMs, 'IndexedDB transaction timed out');
     } catch (err) {
       throw new StorageError('storage-failed', err);
     }
@@ -121,11 +142,16 @@ class IdbStorage {
 
   /** Apply a validated import plan (see data-transfer.js) in one transaction. */
   applyImport(plan) {
-    return this.#tx(STORES, 'readwrite', (tx) => {
-      for (const c of plan.corrections) tx.objectStore('corrections').put(c);
-      for (const p of plan.profiles) tx.objectStore('profiles').put(p);
-      if (plan.settings?.grouping) tx.objectStore('settings').put({ name: 'grouping', value: plan.settings.grouping });
-    });
+    return this.#tx(
+      STORES,
+      'readwrite',
+      (tx) => {
+        for (const c of plan.corrections) tx.objectStore('corrections').put(c);
+        for (const p of plan.profiles) tx.objectStore('profiles').put(p);
+        if (plan.settings?.grouping) tx.objectStore('settings').put({ name: 'grouping', value: plan.settings.grouping });
+      },
+      IMPORT_TIMEOUT_MS,
+    );
   }
 
   deleteAll() {
@@ -181,12 +207,19 @@ class UnavailableStorage {
   }
 }
 
-/** Open storage; never throws — returns an unavailable implementation instead. */
-export async function openStorage(idb = globalThis.indexedDB) {
+/**
+ * Open storage; never throws and never hangs — returns an unavailable
+ * implementation instead (after at most `timeoutMs`).
+ */
+export async function openStorage(idb = globalThis.indexedDB, { timeoutMs = OPEN_TIMEOUT_MS, txTimeoutMs = TX_TIMEOUT_MS } = {}) {
+  let opening = null;
   try {
     if (!idb) throw new Error('IndexedDB unavailable');
-    return new IdbStorage(await openDatabase(idb));
+    opening = openDatabase(idb);
+    return new IdbStorage(await withTimeout(opening, timeoutMs, 'IndexedDB open timed out'), { txTimeoutMs });
   } catch (err) {
+    // If the open completes after we gave up, close it rather than leak it.
+    opening?.then((db) => db.close(), () => {});
     return new UnavailableStorage(err);
   }
 }

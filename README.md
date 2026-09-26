@@ -38,6 +38,7 @@ Then open <http://localhost:8080/>. Localhost counts as a secure context, so the
 | `npm run check` | Verifies the build outputs are current (the unit tests check this too). |
 | `npm test` | Unit + integration tests (Node test runner). |
 | `npm run test:e2e` | Browser tests with the installed **Microsoft Edge** (`E2E_CHANNEL=chrome` for Chrome, `E2E_HEADED=1` to watch). |
+| `npm run test:e2e:webkit` | The same browser tests on **WebKit (Safari's engine)** emulating an iPhone. One-time setup: `npx playwright-core install webkit`. |
 | `npm run bench` | Detector timing per stage (p50/p95). |
 | `npm run icons` | Re-renders the PNG icons. |
 | `npm run profiles -- manifest.json` | Builds reference profiles from curated photos (see below). |
@@ -267,18 +268,19 @@ New versions download in the background. Home shows **Update available → Reloa
 
 ## Testing
 
-- `npm test` runs 147 Node tests:
+- `npm test` runs 152 Node tests:
   - color math (reference Lab values, all Sharma CIEDE2000 pairs, palette consistency),
   - sampling, clustering, matching, grouping precedence and boundaries, confidence caps, calibration round trips,
-  - schema validation, import/export, the AI contract and consent rules, geometry, PWA assets,
+  - schema validation, import/export, storage time limits, the AI contract and consent rules, geometry, PWA assets,
   - pipeline fixtures: all 57 anchors, the 18 required colors under ±20% exposure, stripes at five frequencies, 52/43/5 patterns, red/blue, checkerboards, 10% accents, navy/black, illumination ramps, hard shadows, transparent edges, highlights, warm/cool casts.
-- `npm run test:e2e` runs 22 browser tests:
+- `npm run test:e2e` runs 24 browser tests on the installed Edge (Chromium):
   - upload and multicolor flows, EXIF orientation,
   - same-frame and live calibration,
-  - the fake-camera capture path and permission failures,
+  - the fake-camera capture path, permission failures and browsers without camera support,
   - corrections, export and Delete All, grouping settings, storage-unavailable mode,
   - keyboard and Back behavior, the AI consent flow,
-  - offline reload, a network privacy check, and the service-worker update flow.
+  - offline reload with the site unreachable, a network privacy check, and the service-worker update flow.
+- `npm run test:e2e:webkit` runs the same suite on **WebKit, Safari's engine**, emulating an iPhone 15 (screen size, touch, iOS Safari user agent). Install it once with `npx playwright-core install webkit` (≈170 MB, user folder only). WebKit's Windows build has no camera APIs, so the two live-camera tests are skipped there; everything else runs, including the iPhone “Add to Home Screen” guidance.
 
 ---
 
@@ -293,4 +295,4 @@ New versions download in the background. Home shows **Update available → Reloa
 - The camera needs HTTPS. Torch control depends on the device (usually Android Chrome only).
 - Live calibration ends when you leave the camera screen, as the blueprint requires, so each new camera session needs recalibrating. Same-photo calibration has no such limit.
 - The curated reference-photo builder reads plain sRGB PNGs only.
-- The tests run on desktop Edge (Chromium). Real-device behavior on iOS Safari and Android Chrome (installation, background/resume, camera quirks) still needs manual verification (blueprint §17).
+- Automated tests run on desktop Edge (Chromium) and on WebKit with iPhone emulation, but not on physical phones. The live iPhone camera, home-screen installation and background/resume behavior on iOS Safari and Android Chrome still need manual verification (blueprint §17).

@@ -9,7 +9,8 @@
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs --check",
     "test": "node --test \"tests/unit/**/*.test.mjs\" \"tests/integration/**/*.test.mjs\"",
-    "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/**/*.test.mjs\"",
+    "test:e2e": "node scripts/run-e2e.mjs chromium",
+    "test:e2e:webkit": "node scripts/run-e2e.mjs webkit",
     "bench": "node scripts/bench.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "profiles": "node scripts/build-reference-profiles.mjs"

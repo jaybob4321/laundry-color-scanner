@@ -8,22 +8,20 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { paint, stripes } from '../fixtures/synthetic.mjs';
 import { ROOT } from '../helpers.mjs';
-import { launchBrowser, openPage, pngFile, readResult, startApp, uploadAndAnalyze, writeY4m } from './harness.mjs';
+import { IS_WEBKIT, LIVE_CAMERA_SKIP, browserTest, closeSharedBrowser, launchBrowser, openPage, pngFile, readResult, startApp, uploadAndAnalyze, writeY4m } from './harness.mjs';
 
 let app;
-let browser;
 before(async () => {
   app = await startApp();
-  browser = await launchBrowser();
 });
 after(async () => {
-  await browser?.close();
+  await closeSharedBrowser();
   await app?.close();
 });
 
 const origin = () => new URL(app.baseUrl).origin;
 
-test('boots offline-ready with the worker engine and no console errors', async () => {
+browserTest('boots offline-ready with the worker engine and no console errors', async (browser) => {
   const { page, errors, context } = await openPage(browser, app.baseUrl);
   await page.waitForFunction(() => window.__lcs.pwa.state.offline === 'ready', null, { timeout: 20000 });
   const info = await page.evaluate(() => ({
@@ -36,7 +34,7 @@ test('boots offline-ready with the worker engine and no console errors', async (
   await context.close();
 });
 
-test('camera: rear-camera request, capture from a navy video feed, tracks released', async () => {
+test('camera: rear-camera request, capture from a navy video feed, tracks released', { skip: LIVE_CAMERA_SKIP }, async () => {
   const video = writeY4m(() => [32, 46, 77]);
   const camBrowser = await launchBrowser({ videoFile: video });
   try {
@@ -72,7 +70,7 @@ test('camera: rear-camera request, capture from a navy video feed, tracks releas
   }
 });
 
-test('camera: live white-reference calibration applies to the next capture', async () => {
+test('camera: live white-reference calibration applies to the next capture', { skip: LIVE_CAMERA_SKIP }, async () => {
   const video = writeY4m(() => [205, 205, 205]);
   const camBrowser = await launchBrowser({ videoFile: video });
   try {
@@ -100,9 +98,11 @@ for (const [name, code, pattern] of [
   ['no camera', 'NotFoundError', /No camera was found/],
   ['camera busy', 'NotReadableError', /in use by another app/],
 ]) {
-  test(`camera failure (${name}) shows guidance and an upload fallback`, async () => {
+  browserTest(`camera failure (${name}) shows guidance and an upload fallback`, async (browser) => {
     const { page, errors, context } = await openPage(browser, app.baseUrl, {
-      initScript: `navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('x', '${code}'));`,
+      initScript: `
+        if (!navigator.mediaDevices) Object.defineProperty(navigator, 'mediaDevices', { value: {}, configurable: true });
+        navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('x', '${code}'));`,
     });
     await page.click('#btn-scan');
     await page.waitForSelector('#camera-message:not([hidden])');
@@ -115,20 +115,50 @@ for (const [name, code, pattern] of [
   });
 }
 
-test('offline: after one online visit the app reloads and scans without network', async () => {
-  const { page, context } = await openPage(browser, app.baseUrl);
-  await page.waitForFunction(() => window.__lcs.pwa.state.offline === 'ready', null, { timeout: 20000 });
-  await context.setOffline(true);
-  await page.reload();
-  await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
-  assert.equal(await page.evaluate(() => window.__lcs.detector.mode), 'worker');
-  const r = await uploadAndAnalyze(page, pngFile('stripes.png', stripes([{ color: '#15161A', size: 24 }, { color: '#F2F2F0', size: 24 }], { width: 600, height: 600 })));
-  assert.equal(r.name, 'Multicolor');
-  await context.setOffline(false);
+browserTest('browser without camera support falls back to upload', async (browser) => {
+  const { page, errors, context } = await openPage(browser, app.baseUrl, {
+    initScript: `Object.defineProperty(navigator, 'mediaDevices', { value: undefined, configurable: true });`,
+  });
+  await page.click('#btn-scan');
+  await page.waitForSelector('#camera-message:not([hidden])');
+  assert.match(await page.textContent('#camera-message-text'), /doesn’t support camera access/);
+  assert.equal(await page.isDisabled('#btn-calibrate'), true);
+  await page.click('#btn-camera-cancel');
+  await page.waitForSelector('#screen-home:not([hidden])');
+  assert.deepEqual(errors, []);
   await context.close();
 });
 
-test('privacy: scanning sends no photo, pixel or profile data anywhere', async () => {
+browserTest('iPhone: Home shows Add to Home Screen guidance', { skip: !IS_WEBKIT && 'iOS guidance only appears for iOS Safari' }, async (browser) => {
+  const { page, context } = await openPage(browser, app.baseUrl);
+  await page.waitForSelector('#install-hint:not([hidden])');
+  assert.match(await page.textContent('#install-hint-text'), /tap the Share button, then “Add to Home Screen”/);
+  assert.equal(await page.isHidden('#btn-install'), true, 'no install button where the browser has no install API');
+  await context.close();
+});
+
+browserTest('offline: after one online visit the app reloads and scans with the site unreachable', async (browser) => {
+  // Its own server, taken down mid-test: like airplane mode, every request to
+  // the site fails. (Playwright's setOffline() is used on Chromium as well; in
+  // WebKit it doesn't route navigations through service workers.)
+  const own = await startApp();
+  const { page, context } = await openPage(browser, own.baseUrl);
+  try {
+    await page.waitForFunction(() => window.__lcs.pwa.state.offline === 'ready', null, { timeout: 20000 });
+    await own.close();
+    if (!IS_WEBKIT) await context.setOffline(true);
+    await page.reload();
+    await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
+    assert.equal(await page.evaluate(() => window.__lcs.detector.mode), 'worker', 'detector worker loads from the offline cache');
+    const r = await uploadAndAnalyze(page, pngFile('stripes.png', stripes([{ color: '#15161A', size: 24 }, { color: '#F2F2F0', size: 24 }], { width: 600, height: 600 })));
+    assert.equal(r.name, 'Multicolor');
+  } finally {
+    await context.close();
+    await own.close();
+  }
+});
+
+browserTest('privacy: scanning sends no photo, pixel or profile data anywhere', async (browser) => {
   const { page, context, requests } = await openPage(browser, app.baseUrl);
   await page.waitForFunction(() => window.__lcs.pwa.state.offline === 'ready', null, { timeout: 20000 });
   const before = requests.length;
@@ -147,7 +177,7 @@ test('privacy: scanning sends no photo, pixel or profile data anywhere', async (
   await context.close();
 });
 
-test('update: a new version installs in the background and activates only from Home', async () => {
+browserTest('update: a new version installs in the background and activates only from Home', async (browser) => {
   const { page, context } = await openPage(browser, app.baseUrl);
   await page.waitForFunction(() => window.__lcs.pwa.state.offline === 'ready', null, { timeout: 20000 });
   const sw = readFileSync(join(ROOT, 'sw.js'), 'utf8').replace(/version: '[^']+'/, "version: 'e2e-update'");

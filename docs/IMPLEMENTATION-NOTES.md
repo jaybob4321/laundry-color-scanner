@@ -18,7 +18,23 @@ Blueprint §20 steps 1–6 are implemented and tested in this repository. Steps 
 | AI fallback (§16) | Interface only, disabled | Contract validation, consent, cancel and timeout tests; mock provider in debug builds |
 | Real-device matrix, held-out garment metrics (§17) | **Not done** | Needs iOS Safari and Android Chrome devices and a labeled garment set |
 
-Test totals: 147 Node tests (`npm test`) and 22 browser tests (`npm run test:e2e`, system Edge via `playwright-core`).
+Test totals: 152 Node tests (`npm test`) and 24 browser tests, run on two engines:
+
+- **Chromium** (system Edge, `npm run test:e2e`): 23 pass. One iOS-only test is skipped.
+- **WebKit 26.6** (Safari's engine, iPhone 15 emulation, `npm run test:e2e:webkit`): 22 pass on three consecutive runs. The two live-camera tests are skipped because WebKit's Windows build has no media-capture APIs.
+
+What the WebKit work found and fixed:
+
+- **Test-tool limit.** Playwright's simulated offline mode doesn't route WebKit navigations through service workers. The offline test now takes the site down instead, which is closer to airplane mode. With the site unreachable, WebKit reloads the app from its cache and scans correctly.
+- **Visual review** of every screen at iPhone size, in light and dark:
+  - Settings dropdowns were truncating group names.
+  - The numeric crop fields were 13 px, which makes iOS zoom the page on focus.
+- **Intermittent failures** traced to two causes:
+  1. Taps occasionally swallowed right after page load, about 1 in 30. Adding `touch-action: manipulation` (deviation 17) brought this to 0 in 90.
+  2. Rare browser-process crashes in WebKit's Windows build. A controlled experiment ran 240 page loads over 40 launches with the service worker, IndexedDB and detector worker each disabled in turn. It had 0 crashes in every variant, so no app feature triggers them. The browser test harness now relaunches WebKit and retries a test once *only* when the browser process disconnected; failures in a healthy browser are never retried.
+- **Hardening:** storage time limits (deviation 16), so a stuck IndexedDB can never leave the app unresponsive.
+
+Deployment: GitHub Pages at <https://jaybob4321.github.io/laundry-color-scanner/>. It has been verified live: HTTPS, service-worker scope, offline cache, and real scans.
 
 ### Measured performance (desktop, Node 24, `npm run bench`)
 
@@ -50,6 +66,8 @@ Optimizations so far are value-identical: output fingerprints over 63 fixtures w
 13. **Reference-photo builder** (§14) ships with a PNG-only decoder. It *rejects* ICC-tagged, non-sRGB-tagged and EXIF-oriented files with a reason, until a color-managed build-time decoder is chosen. JPEG/HEIC → export as sRGB PNG.
 14. **AI fallback** includes the contract, validation, consent UI and a same-origin proxy client, but **no server proxy or vendor adapter**. The default static deployment needs none (§16). A local mock provider exists for debug builds and tests only.
 15. **File layout** follows §2 with these additions: `src/detection/{sampling,pattern}.js`, `src/geometry.js`, `src/detector-client.js`, `src/data-transfer.js`, `src/live-feedback.js`, `src/util/`, and `src/ui/` (screens) instead of a single `app.js`.
+16. **Storage time limits.** Opening IndexedDB is limited to 4 s and each storage operation to 5 s (60 s for imports). Past that, storage degrades to “Could not save locally”, as in private browsing. A hung IndexedDB is a known Safari failure mode, and blocking startup on it would violate §15 (“IndexedDB failure must not prevent online core scanning”).
+17. **`touch-action: manipulation`** is set on the document and on interactive controls. This removes iOS double-tap-to-zoom from app controls, so taps register immediately and are never swallowed as a zoom gesture. Pinch-zoom is kept for accessibility.
 
 ## Review items for the architect
 

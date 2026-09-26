@@ -2,26 +2,24 @@
  * Browser flows: upload → crop → results, multicolor, calibration,
  * corrections and local data, errors, keyboard and Back, EXIF, AI consent.
  */
-import { after, before, test } from 'node:test';
+import { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { applyCast, blocks, paint, solid, stripes } from '../fixtures/synthetic.mjs';
-import { launchBrowser, openPage, pngFile, readResult, startApp, uploadAndAnalyze } from './harness.mjs';
+import { browserTest, closeSharedBrowser, openPage, pngFile, readResult, startApp, uploadAndAnalyze } from './harness.mjs';
 
 let app;
-let browser;
 before(async () => {
   app = await startApp();
-  browser = await launchBrowser();
 });
 after(async () => {
-  await browser?.close();
+  await closeSharedBrowser();
   await app?.close();
 });
 
 const navyPhoto = () =>
   pngFile('navy.png', paint(900, 700, (x, y) => (x > 120 && x < 780 && y > 60 && y < 640 ? [36, 49, 82] : [216, 210, 196]), { noise: 3 }));
 
-test('upload: navy garment → Navy / Darks with matches, HEX and RGB', async () => {
+browserTest('upload: navy garment → Navy / Darks with matches, HEX and RGB', async (browser) => {
   const { page, errors, context } = await openPage(browser, app.baseUrl);
   const r = await uploadAndAnalyze(page, navyPhoto());
   assert.equal(r.name, 'Navy');
@@ -33,7 +31,7 @@ test('upload: navy garment → Navy / Darks with matches, HEX and RGB', async ()
   await context.close();
 });
 
-test('upload: 50/50 black-white stripes → Multicolor with separate swatches, never gray', async () => {
+browserTest('upload: 50/50 black-white stripes → Multicolor with separate swatches, never gray', async (browser) => {
   const { page, errors, context } = await openPage(browser, app.baseUrl);
   const r = await uploadAndAnalyze(page, pngFile('stripes.png', stripes([{ color: '#15161A', size: 30 }, { color: '#F2F2F0', size: 30 }], { width: 900, height: 700, noise: 2 })));
   assert.equal(r.name, 'Multicolor');
@@ -46,7 +44,7 @@ test('upload: 50/50 black-white stripes → Multicolor with separate swatches, n
   await context.close();
 });
 
-test('upload: 50/50 red/blue blocks → Multicolor', async () => {
+browserTest('upload: 50/50 red/blue blocks → Multicolor', async (browser) => {
   const { page, context } = await openPage(browser, app.baseUrl);
   const r = await uploadAndAnalyze(page, pngFile('rb.png', blocks('#C8323E', '#3657AD', { width: 900, height: 700, noise: 2 })));
   assert.equal(r.name, 'Multicolor');
@@ -54,7 +52,7 @@ test('upload: 50/50 red/blue blocks → Multicolor', async () => {
   await context.close();
 });
 
-test('same-frame white reference corrects a warm cast; comparison and reset work', async () => {
+browserTest('same-frame white reference corrects a warm cast; comparison and reset work', async (browser) => {
   const warm = [1.3, 1.0, 0.72];
   const scene = applyCast(
     paint(1200, 900, (x, y) => (x < 264 && y > 648 ? [215, 215, 215] : x > 300 && x < 1020 && y > 72 && y < 828 ? [197, 199, 203] : [120, 100, 80])),
@@ -78,7 +76,7 @@ test('same-frame white reference corrects a warm cast; comparison and reset work
   await context.close();
 });
 
-test('correction is saved locally, listed in Settings, exported without photos, and Delete All clears it', async () => {
+browserTest('correction is saved locally, listed in Settings, exported without photos, and Delete All clears it', async (browser) => {
   const { page, errors, context } = await openPage(browser, app.baseUrl);
   await uploadAndAnalyze(page, navyPhoto());
   await page.click('#btn-correct');
@@ -112,7 +110,7 @@ test('correction is saved locally, listed in Settings, exported without photos, 
   await context.close();
 });
 
-test('reference profile: quality gates preview and saving numbers only', async () => {
+browserTest('reference profile: quality gates preview and saving numbers only', async (browser) => {
   const { page, context } = await openPage(browser, app.baseUrl);
   await uploadAndAnalyze(page, navyPhoto());
   await page.click('button:has-text("Add Reference")');
@@ -129,7 +127,7 @@ test('reference profile: quality gates preview and saving numbers only', async (
   await context.close();
 });
 
-test('grouping settings: successive changes all persist, keep focus, and apply to new scans', async () => {
+browserTest('grouping settings: successive changes all persist, keep focus, and apply to new scans', async (browser) => {
   const { page, errors, context } = await openPage(browser, app.baseUrl);
   await page.click('#btn-settings');
   const row = (name) => page.locator('.override-row').filter({ has: page.locator('span', { hasText: new RegExp(`^${name}$`) }) });
@@ -156,7 +154,7 @@ test('grouping settings: successive changes all persist, keep focus, and apply t
   await context.close();
 });
 
-test('storage unavailable: scanning still works and saving says so', async () => {
+browserTest('storage unavailable: scanning still works and saving says so', async (browser) => {
   const { page, errors, context } = await openPage(browser, app.baseUrl, {
     initScript: () => Object.defineProperty(window, 'indexedDB', { get: () => undefined }),
   });
@@ -170,7 +168,7 @@ test('storage unavailable: scanning still works and saving says so', async () =>
   await context.close();
 });
 
-test('upload errors: unsupported type, oversize file, mostly transparent image', async () => {
+browserTest('upload errors: unsupported type, oversize file, mostly transparent image', async (browser) => {
   const { page, context } = await openPage(browser, app.baseUrl);
   await page.setInputFiles('#file-input', { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
   await page.waitForSelector('#toast:not([hidden])');
@@ -188,7 +186,7 @@ test('upload errors: unsupported type, oversize file, mostly transparent image',
   await context.close();
 });
 
-test('keyboard moves and resizes the target; numeric fields stay in sync', async () => {
+browserTest('keyboard moves and resizes the target; numeric fields stay in sync', async (browser) => {
   const { page, context } = await openPage(browser, app.baseUrl);
   await page.setInputFiles('#file-input', navyPhoto());
   await page.waitForSelector('#screen-crop:not([hidden])');
@@ -210,7 +208,7 @@ test('keyboard moves and resizes the target; numeric fields stay in sync', async
   await context.close();
 });
 
-test('browser Back behaves like Cancel', async () => {
+browserTest('browser Back behaves like Cancel', async (browser) => {
   const { page, context } = await openPage(browser, app.baseUrl);
   await page.click('#btn-settings');
   await page.waitForSelector('#screen-settings:not([hidden])');
@@ -226,7 +224,7 @@ test('browser Back behaves like Cancel', async () => {
   await context.close();
 });
 
-test('EXIF orientation is applied exactly once', async () => {
+browserTest('EXIF orientation is applied exactly once', async (browser) => {
   const { page, context } = await openPage(browser, app.baseUrl);
   const out = await page.evaluate(async () => {
     const c = document.createElement('canvas');
@@ -257,7 +255,7 @@ test('EXIF orientation is applied exactly once', async () => {
   await context.close();
 });
 
-test('AI review (mock provider): nothing is sent without Send; suggestion stays separate', async () => {
+browserTest('AI review (mock provider): nothing is sent without Send; suggestion stays separate', async (browser) => {
   const { page, context, requests } = await openPage(browser, `${app.baseUrl}?ai=mock`);
   assert.match(await page.textContent('#privacy-note'), /unless you choose AI review/);
   await uploadAndAnalyze(page, pngFile('neon.png', solid([0, 255, 64], { width: 600, height: 600, noise: 2 })));

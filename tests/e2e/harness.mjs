@@ -1,12 +1,17 @@
 /**
- * Browser test harness: static server + system Chromium-family browser
- * (Edge by default; set E2E_CHANNEL=chrome for Chrome, E2E_HEADED=1 to watch).
- * Uses playwright-core, so no browsers are downloaded.
+ * Browser test harness: static server + a browser engine.
+ *
+ *   E2E_BROWSER=chromium (default)  system Edge (E2E_CHANNEL=chrome for Chrome)
+ *   E2E_BROWSER=webkit              Playwright WebKit (Safari's engine) emulating
+ *                                   an iPhone; install once with
+ *                                   `npx playwright-core install webkit`
+ *   E2E_HEADED=1                    show the browser window
  */
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { chromium } from 'playwright-core';
+import { test } from 'node:test';
+import { chromium, devices, webkit } from 'playwright-core';
 import { encodePNG } from '../../scripts/lib/png.mjs';
 import { startServer } from '../../scripts/serve.mjs';
 
@@ -14,10 +19,26 @@ export async function startApp() {
   const overrides = new Map();
   const server = await startServer({ port: 0, quiet: true, overrides });
   const baseUrl = `http://127.0.0.1:${server.address().port}/`;
-  return { baseUrl, overrides, close: () => new Promise((r) => server.close(r)) };
+  const close = () =>
+    new Promise((r) => {
+      server.closeAllConnections?.();
+      server.close(r);
+    });
+  return { baseUrl, overrides, close };
 }
 
+export const ENGINE = (process.env.E2E_BROWSER ?? 'chromium').toLowerCase();
+export const IS_WEBKIT = ENGINE === 'webkit';
+
+/**
+ * WebKit's Windows build has no media-capture support (no MediaStream,
+ * no getUserMedia), so live camera frames can only be tested in Chromium's
+ * fake capture device, and on a real iPhone.
+ */
+export const LIVE_CAMERA_SKIP = IS_WEBKIT && 'WebKit on Windows has no media capture; covered by Chromium runs and real-device testing';
+
 export async function launchBrowser({ fakeCamera = true, videoFile = null, autoAcceptCamera = false } = {}) {
+  if (IS_WEBKIT) return webkit.launch({ headless: !process.env.E2E_HEADED });
   const args = [];
   if (fakeCamera) args.push('--use-fake-device-for-media-stream');
   if (autoAcceptCamera) args.push('--use-fake-ui-for-media-stream');
@@ -25,9 +46,62 @@ export async function launchBrowser({ fakeCamera = true, videoFile = null, autoA
   return chromium.launch({ channel: process.env.E2E_CHANNEL ?? 'msedge', headless: !process.env.E2E_HEADED, args });
 }
 
+let shared = null;
+
+/** One browser per test file, relaunched if its process has died. */
+export async function sharedBrowser() {
+  if (!shared || !shared.isConnected()) shared = await launchBrowser();
+  return shared;
+}
+
+export async function closeSharedBrowser() {
+  await shared?.close().catch(() => {});
+  shared = null;
+}
+
+/**
+ * A test that runs in the shared browser: fn(browser, t).
+ *
+ * WebKit's Windows build occasionally crashes its browser process. On WebKit
+ * only, a test during which the browser *disconnected* is relaunched and run
+ * once more (with a logged diagnostic). Failures in a healthy browser are
+ * never retried, so real app bugs still fail.
+ */
+export function browserTest(name, options, fn) {
+  if (typeof options === 'function') [fn, options] = [options, {}];
+  test(name, options, async (t) => {
+    for (let attempt = 1; ; attempt++) {
+      const browser = await sharedBrowser();
+      let disconnected = false;
+      const onDisconnect = () => {
+        disconnected = true;
+      };
+      browser.on('disconnected', onDisconnect);
+      try {
+        return await fn(browser, t);
+      } catch (err) {
+        if (IS_WEBKIT && attempt === 1) {
+          // A crash can surface as a timeout just before the disconnect event.
+          if (!disconnected) await new Promise((r) => setTimeout(r, 2000));
+          if (disconnected || !browser.isConnected()) {
+            t.diagnostic(`WebKit browser crashed (${String(err?.message).split('\n')[0]}); relaunched and retried once`);
+            continue;
+          }
+        }
+        throw err;
+      } finally {
+        browser.off('disconnected', onDisconnect);
+      }
+    }
+  });
+}
+
+// WebKit runs emulate an iPhone (viewport, touch, iOS Safari user agent).
+const DEVICE = IS_WEBKIT ? { ...devices['iPhone 15'] } : { viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 };
+
 /** New page that records console errors, page errors and every network request. */
 export async function openPage(browser, url, { contextOptions = {}, initScript = null } = {}) {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, ...contextOptions });
+  const context = await browser.newContext({ ...DEVICE, ...contextOptions });
   const page = await context.newPage();
   const errors = [];
   const requests = [];
