@@ -9,6 +9,8 @@ A mobile-first Progressive Web App. Point your phone camera at a piece of clothi
 
 Everything runs **on the device**. Photos are never uploaded, never stored, and the detector needs no network or API key. Once installed, it works offline.
 
+**Live app:** <https://jaybob4321.github.io/laundry-color-scanner/> — open it on your phone and allow camera access. To install, use **Add to Home Screen** (iPhone: Share → Add to Home Screen; Android: the Install prompt).
+
 > Color sorting suggestion only. Follow the care label; wash new or bleeding items separately.
 
 This is one shared project. [docs/BLUEPRINT.md](docs/BLUEPRINT.md) (technical design by ChatGPT) is authoritative for behavior. [spec/colors.json](spec/colors.json) is authoritative for the seed colors. [docs/IMPLEMENTATION-NOTES.md](docs/IMPLEMENTATION-NOTES.md) records implementation status, measured performance and every deviation from the blueprint.
@@ -41,6 +43,12 @@ Then open <http://localhost:8080/>. Localhost counts as a secure context, so the
 | `npm run profiles -- manifest.json` | Builds reference profiles from curated photos (see below). |
 
 **On a phone:** browsers only allow camera access over HTTPS, so serve the folder from any static HTTPS host (GitHub Pages, Netlify, Cloudflare Pages…) or through an HTTPS tunnel to `npm start`. The app uses only relative paths, so hosting in a subdirectory works.
+
+**Publishing updates (GitHub Pages).** The live app is served straight from the `main` branch root; `.nojekyll` makes Pages serve files as-is. After changing anything:
+
+1. Run `npm run build` (refreshes the offline cache version), then `npm test`.
+2. Commit and `git push`. Pages redeploys in about a minute.
+3. Phones that already have the app show **Update available → Reload to update** on Home.
 
 **Development switches** (only while `debugAvailable` is true in [src/app-config.js](src/app-config.js)):
 
